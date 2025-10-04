@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense App – Manager Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-title">Manager Dashboard</div>
+      <!-- Pending Approvals -->
+      <div style="width: 100%">
+        <h3 style="color: #22223b; margin-bottom: 0.5rem; font-size: 1.13rem">
+          Pending Approval
+        </h3>
+        <table
+          style="width: 100%; border-collapse: collapse; font-size: 0.96rem"
+        >
+          <thead>
+            <tr style="background: #f3f0ff">
+              <th>Employee</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="pending-table">
+            <!-- JS will fill -->
+          </tbody>
+        </table>
+      </div>
+      <a class="signup-link" href="index.html">Logout</a>
+    </div>
+    <script>
+      // Dummy pending approvals
+      function loadPending() {
+        const dummy = [
+          { id: 1, emp: "alice@ex.com", amt: "1200", date: "2025-09-15" },
+          { id: 2, emp: "bob@ex.com", amt: "800", date: "2025-09-16" },
+        ];
+        const tbody = document.getElementById("pending-table");
+        tbody.innerHTML = dummy
+          .map(
+            (r) => `<tr>
+                <td>${r.emp}</td>
+                <td>${r.amt}</td>
+                <td>${r.date}</td>
+                <td>
+                  <button onclick="approve(${r.id})">Approve</button>
+                  <button onclick="reject(${r.id})" style="margin-left:4px;">Reject</button>
+                </td>
+              </tr>`
+          )
+          .join("");
+      }
+      function approve(id) {
+        alert("Approved #" + id + " (demo)");
+        // Add API call to approve
+      }
+      function reject(id) {
+        alert("Rejected #" + id + " (demo)");
+        // Add API call to reject
+      }
+      loadPending();
+    </script>
+  </body>
+</html>

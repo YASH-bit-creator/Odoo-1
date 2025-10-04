@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense App – Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-title">Admin Dashboard</div>
+
+      <!-- Create Employee/Manager -->
+      <form class="login-form" id="add-user-form">
+        <label for="user-email">Add User Email</label>
+        <input type="email" id="user-email" required />
+
+        <label for="user-password">User Password</label>
+        <input type="password" id="user-password" required />
+
+        <label for="user-role">Role</label>
+        <select id="user-role" required>
+          <option value="employee">Employee</option>
+          <option value="manager">Manager</option>
+        </select>
+
+        <label for="user-manager">Assign Manager (email)</label>
+        <input
+          type="email"
+          id="user-manager"
+          placeholder="(Optional for Employee)"
+        />
+
+        <div class="error-msg" id="add-user-error"></div>
+        <button type="submit" class="login-btn">Add User</button>
+      </form>
+
+      <!-- Approval Flow Configuration -->
+      <form class="login-form" id="approval-flow-form" style="margin-top: 2rem">
+        <label for="approval-sequence">Set Approval Sequence</label>
+        <select multiple id="approval-sequence">
+          <option value="manager">Manager</option>
+          <option value="finance">Finance</option>
+          <option value="director">Director</option>
+        </select>
+        <div style="font-size: 0.95rem; color: #222; margin: 0.5rem 0">
+          Hold Ctrl (Windows) or Cmd (Mac) to select multiple steps in order
+        </div>
+        <button type="submit" class="login-btn">Set Flow</button>
+      </form>
+
+      <a class="signup-link" href="index.html">Logout</a>
+    </div>
+
+    <script>
+      // Add user form
+      document.getElementById("add-user-form").onsubmit = async function (e) {
+        e.preventDefault();
+        document.getElementById("add-user-error").textContent = "";
+
+        const email = document.getElementById("user-email").value.trim();
+        const password = document.getElementById("user-password").value;
+        const role = document.getElementById("user-role").value;
+        const manager = document.getElementById("user-manager").value.trim();
+
+        try {
+          const res = await fetch("http://localhost:5000/api/admin/add-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, role, manager }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            alert("User added!");
+            document.getElementById("add-user-form").reset();
+          } else {
+            document.getElementById("add-user-error").textContent =
+              data.message || "Error adding user.";
+          }
+        } catch (err) {
+          document.getElementById("add-user-error").textContent =
+            "Server error. Please try later.";
+        }
+      };
+
+      // Approval flow form
+      document.getElementById("approval-flow-form").onsubmit = async function (
+        e
+      ) {
+        e.preventDefault();
+        const seq = Array.from(
+          document.getElementById("approval-sequence").selectedOptions
+        ).map((opt) => opt.value);
+
+        // Send approval flow setup to API
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/admin/set-approval-flow",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sequence: seq }),
+            }
+          );
+          if (res.ok) {
+            alert("Approval flow set!");
+          }
+        } catch {}
+      };
+    </script>
+  </body>
+</html>

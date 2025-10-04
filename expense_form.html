@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense App – Submit Expense</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-title">Submit Expense</div>
+      <form class="login-form" id="expense-form">
+        <label for="amount">Amount</label>
+        <input type="number" step="0.01" id="amount" name="amount" required />
+
+        <label for="currency">Currency</label>
+        <input
+          type="text"
+          id="currency"
+          name="currency"
+          placeholder="e.g. INR, USD"
+          required
+        />
+
+        <label for="category">Category</label>
+        <input type="text" id="category" name="category" required />
+
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" required />
+
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="receipt">Upload Receipt (image/pdf)</label>
+        <input
+          type="file"
+          id="receipt"
+          name="receipt"
+          accept="image/*,application/pdf"
+          required
+        />
+
+        <div class="error-msg" id="expense-error"></div>
+        <button type="submit" class="login-btn">Submit Expense</button>
+      </form>
+      <a class="signup-link" href="employee.html">Back to Dashboard</a>
+    </div>
+    <script>
+      document.getElementById("expense-form").onsubmit = async function (e) {
+        e.preventDefault();
+        document.getElementById("expense-error").textContent = "";
+
+        const amount = document.getElementById("amount").value;
+        const currency = document.getElementById("currency").value;
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("description").value;
+        const date = document.getElementById("date").value;
+        const receipt = document.getElementById("receipt").files[0];
+
+        // Prepare form data for upload, including file
+        const formData = new FormData();
+        formData.append("amount", amount);
+        formData.append("currency", currency);
+        formData.append("category", category);
+        formData.append("description", description);
+        formData.append("date", date);
+        formData.append("receipt", receipt);
+
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/employee/submit-expense",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          if (res.ok) {
+            alert("Expense submitted!");
+            document.getElementById("expense-form").reset();
+          } else {
+            document.getElementById("expense-error").textContent =
+              "Error submitting expense.";
+          }
+        } catch {
+          document.getElementById("expense-error").textContent =
+            "Server error.";
+        }
+      };
+    </script>
+  </body>
+</html>

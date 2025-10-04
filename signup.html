@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense App – Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-title">Signup for Expense App</div>
+      <form class="login-form" id="signup-form">
+        <label for="signup-email">Email</label>
+        <input
+          type="email"
+          id="signup-email"
+          name="email"
+          required
+          autocomplete="email"
+        />
+
+        <label for="signup-password">Password</label>
+        <input
+          type="password"
+          id="signup-password"
+          name="password"
+          required
+          autocomplete="new-password"
+        />
+
+        <label for="company-name">Company Name</label>
+        <input type="text" id="company-name" name="company" required />
+
+        <label for="country">Country</label>
+        <select id="country" name="country" required>
+          <option value="">Select country</option>
+          <!-- Countries will be loaded here by JS -->
+        </select>
+
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="employee">Employee</option>
+        </select>
+
+        <div class="error-msg" id="signup-error"></div>
+        <button type="submit" class="login-btn">Signup</button>
+      </form>
+      <a class="signup-link" href="login.html"
+        >Already have an account? Login</a
+      >
+    </div>
+
+    <script>
+      // Populate countries from API
+      fetch("https://restcountries.com/v3.1/all?fields=name")
+        .then((res) => res.json())
+        .then((data) => {
+          const select = document.getElementById("country");
+          data.forEach((country) => {
+            const name = country.name.common || country.name;
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+          });
+        });
+
+      document.getElementById("signup-form").onsubmit = async function (e) {
+        e.preventDefault();
+        document.getElementById("signup-error").textContent = "";
+
+        const email = document.getElementById("signup-email").value.trim();
+        const password = document.getElementById("signup-password").value;
+        const company = document.getElementById("company-name").value.trim();
+        const country = document.getElementById("country").value;
+        const role = document.getElementById("role").value;
+
+        try {
+          const res = await fetch("http://localhost:5000/api/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, company, country, role }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            window.location.href = "index.html"; // Redirect to login
+          } else {
+            document.getElementById("signup-error").textContent =
+              data.message || "Signup failed.";
+          }
+        } catch (err) {
+          document.getElementById("signup-error").textContent =
+            "Server error. Please try later.";
+        }
+      };
+    </script>
+  </body>
+</html>

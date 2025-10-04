@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense App – Employee Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-title">Employee Dashboard</div>
+      <!-- Submit Expense -->
+      <form class="login-form" id="expense-form">
+        <label for="amount">Amount</label>
+        <input type="number" step="0.01" id="amount" required />
+
+        <label for="currency">Currency</label>
+        <input type="text" id="currency" placeholder="e.g. USD, INR" required />
+
+        <label for="category">Category</label>
+        <input type="text" id="category" required />
+
+        <label for="description">Description</label>
+        <input type="text" id="description" required />
+
+        <label for="date">Date</label>
+        <input type="date" id="date" required />
+
+        <label for="receipt">Upload Receipt (image/pdf)</label>
+        <input type="file" id="receipt" accept="image/*,application/pdf" />
+
+        <div class="error-msg" id="expense-error"></div>
+        <button type="submit" class="login-btn">Submit Expense</button>
+      </form>
+      <!-- History Table -->
+      <div style="width: 100%; margin-top: 2rem">
+        <h3 style="color: #22223b; margin-bottom: 0.5rem; font-size: 1.13rem">
+          Expense History
+        </h3>
+        <table
+          style="width: 100%; border-collapse: collapse; font-size: 0.96rem"
+        >
+          <thead>
+            <tr style="background: #f3f0ff">
+              <th style="padding: 0.4rem 0">Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="expense-history">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+      <a class="signup-link" href="index.html">Logout</a>
+    </div>
+    <script>
+      // Submit expense JS
+      document.getElementById("expense-form").onsubmit = async function (e) {
+        e.preventDefault();
+        document.getElementById("expense-error").textContent = "";
+
+        // Collect form data
+        const amount = document.getElementById("amount").value;
+        const currency = document.getElementById("currency").value;
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("description").value;
+        const date = document.getElementById("date").value;
+        // For hackathon/demo: just assume file upload works
+
+        // Demo API call (replace with your API)
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/employee/submit-expense",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                amount,
+                currency,
+                category,
+                description,
+                date,
+              }),
+            }
+          );
+          if (res.ok) {
+            alert("Submitted! (Mock: Add logic to refresh history)");
+          } else {
+            document.getElementById("expense-error").textContent =
+              "Error submitting expense.";
+          }
+        } catch {
+          document.getElementById("expense-error").textContent =
+            "Server error.";
+        }
+      };
+
+      // Load expense history table (dummy for now)
+      function loadHistory() {
+        const dummy = [
+          { amt: "1000", date: "2025-09-15", status: "Approved" },
+          { amt: "520", date: "2025-09-22", status: "Pending" },
+        ];
+        const tbody = document.getElementById("expense-history");
+        tbody.innerHTML = dummy
+          .map(
+            (r) => `<tr>
+                <td>${r.amt}</td>
+                <td>${r.date}</td>
+                <td>${r.status}</td>
+              </tr>`
+          )
+          .join("");
+      }
+      loadHistory();
+    </script>
+  </body>
+</html>
